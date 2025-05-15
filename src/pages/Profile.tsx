@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppHeader from '@/components/AppHeader';
 import ProfileForm from '@/components/ProfileForm';
-import DbDiagnostics from '@/components/DbDiagnostics';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, UserProfile } from '@/types/user';
@@ -85,78 +84,6 @@ const Profile = () => {
 
     loadUserProfile();
   }, [authUser, navigate]);
-
-  // Função para criar todas as tabelas necessárias de uma só vez
-  const inicializarBancoDados = async () => {
-    if (!authUser || !userProfile) return;
-    
-    try {
-      setLoading(true);
-      
-      // 1. Atualizar tabela profiles (deve já existir)
-      console.log('Inicializando tabela profiles...');
-      await upsertUserProfile(
-        authUser.id,
-        userProfile.name,
-        userProfile.email
-      );
-      
-      // 2. Criar um perfil básico padrão
-      console.log('Inicializando tabela user_profiles...');
-      await saveUserProfileDetails(
-        authUser.id,
-        {
-          age: 30,
-          gender: 'masculino',
-          height: 170,
-          currentWeight: 70,
-          goalWeight: 65, 
-          activityLevel: 'moderado'
-        }
-      );
-      
-      // 3. Criar métricas básicas padrão
-      const metricsBasicas = calculateUserMetrics({
-        age: 30,
-        gender: 'masculino',
-        height: 170,
-        currentWeight: 70,
-        goalWeight: 65,
-        activityLevel: 'moderado',
-        weightHistory: []
-      });
-      
-      const bmi = calculateBMI(170, 70);
-      
-      console.log('Inicializando tabela user_metrics...');
-      await saveUserMetrics(
-        authUser.id,
-        {
-          bmr: metricsBasicas.bmr,
-          dailyCalories: metricsBasicas.dailyCalories,
-          weeklyGoal: metricsBasicas.weeklyGoal,
-          bmi: bmi
-        }
-      );
-      
-      // 4. Adicionar um registro de peso inicial
-      console.log('Inicializando tabela weight_history...');
-      await addWeightRecord(
-        authUser.id,
-        70
-      );
-      
-      toast.success('Banco de dados inicializado com sucesso!');
-      
-      // Recarregar a página para ver os dados
-      window.location.reload();
-    } catch (error) {
-      console.error('Erro ao inicializar banco de dados:', error);
-      toast.error('Erro ao inicializar banco de dados');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleProfileUpdate = async (profileData: Partial<UserProfile>) => {
     if (!authUser || !userProfile) return;
@@ -278,36 +205,6 @@ const Profile = () => {
               />
             </CardContent>
           </Card>
-          
-          {/* Diagnóstico temporário do banco de dados */}
-          <div className="mt-6">
-            <DbDiagnostics />
-          </div>
-          
-          {/* Botão para inicializar o banco de dados */}
-          <div className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-semibold">Inicializar Banco de Dados</CardTitle>
-                <CardDescription>
-                  Use este botão para criar todas as tabelas necessárias com dados padrão
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm mb-4">
-                  Esta função irá criar registros nas tabelas de perfil, métricas e histórico de peso
-                  com dados padrão para inicializar o banco de dados.
-                </p>
-                <Button 
-                  onClick={inicializarBancoDados}
-                  className="w-full bg-nutrivida-secondary hover:bg-nutrivida-secondary/80"
-                  disabled={loading}
-                >
-                  {loading ? 'Inicializando...' : 'Inicializar Banco de Dados'}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </main>
       
