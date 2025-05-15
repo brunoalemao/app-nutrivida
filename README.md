@@ -81,3 +81,6 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 Para dúvidas ou sugestões, entre em contato conosco:
 - Email: contato@vidaleveai.com.br
 - Website: [www.vidaleveai.com.br](https://www.vidaleveai.com.br)
+
+## Última atualização
+Projeto atualizado em 2024.
